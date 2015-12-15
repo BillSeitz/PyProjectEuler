@@ -64,79 +64,117 @@ cols[23] = (1,1,2,2,2,6,1)
 cols[24] = (7,1,3,2,1,1)
 
 def show_header(): #bah just fixed for 25 right now
-	print '0123456789012345678901234'
-	
+    print '0123456789012345678901234'
+    
 def row(size_list, starts_list):
-	"""
-	output row as series of characters
-	"""
-	#out = '0' * grid_size
-	out = ''
-	c = 0
-	for i in range(0, len(size_list)):
-		if starts_list[i] > c: # next start is after current row
-			out = out + ('0' * (starts_list[i] - c))
-		out = out + ('1' * size_list[i])
-		c = starts_list[i] + size_list[i]
-	if c < 25:
-		out = out + ('0' * (25 - c))
-	return out		
+    """
+    output row as series of characters
+    """
+    #out = '0' * grid_size
+    out = ''
+    c = 0
+    for i in range(0, len(size_list)):
+        if starts_list[i] > c: # next start is after current row
+            out = out + ('0' * (starts_list[i] - c))
+        out = out + ('1' * size_list[i])
+        c = starts_list[i] + size_list[i]
+    if c < 25:
+        out = out + ('0' * (25 - c))
+    return out      
 
 def leftest(size_list):
-	"""
-	Return "solution" (list of starts) for a row that puts each run as far left as possible
-	"""
-	starts_list = []
-	c = 0
-	for run in size_list:
-		starts_list.append(c)
-		c = c + run + 1
-	#print starts_list
-	return starts_list
+    """
+    Return "solution" (list of starts) for a row that puts each run as far left as possible
+    """
+    starts_list = []
+    c = 0
+    for run in size_list:
+        starts_list.append(c)
+        c = c + run + 1
+    #print starts_list
+    return starts_list
 
 def next(size_list, starts_list):
+    """
+    Return "next solution" list of starts after current solution
+    Do this recursively:
+    * start at right-most run
+    * if rest of runs are jammed as far right as possible against it..
+     * then bump them back to far-left and move right-most 1 more to the right
+    * else:
+     * do next(all but rightmost)
+    """
+    return False
+    
+def first_solution():
+    """
+    Make the first global solution of using leftest() for every row
+    """
+    rows = {}
+    for i in range(0, grid_max):
+        rows[i] = row(sizes[i], leftest(sizes[i]))
+    return rows 
+    
+def display(rows): # output a solution grid
+    show_header()
+    #print rows
+    for row in rows:
+        print rows[row]
+    
+def col(i, solution):
+    """
+    Return column i from solution grid (looks like rows[i])
+    """
+    col = ""
+    for row in solution:
+        col = col + solution[row][i]
+    return col
+    
+def test_col(i, col):
+    """
+    Return whether a column from a solution grid matches the spec cols
+    """
+    col_runs = []
+    state = 'out'
+    l = 0
+    for j in col:
+        print 'j, state, l, col: ', j, state, l, col
+        if (state == 'out') and (j == '0'):
+            continue
+        elif (state == 'in') and (j == '1'):
+            l = l + 1
+            continue
+        elif (state == 'out') and (j == '1'):
+            l = 1
+            state = 'in'
+            continue
+        else: # (state == 'in') and (j == '0'):
+            col_runs.append(l)
+            state = 'out'
+            l = 0
+            continue
+    if (state == 'in') and (l > 0):
+        col_runs.append(l)
+    print col_runs
+    if col_runs == cols[i]:
+    	return True
+    else:
+    	return False
+
+def test_solution(solution):
 	"""
-	Return "next solution" list of starts after current solution
-	Do this recursively:
-	* start at right-most run
-	* if rest of runs are jammed as far right as possible against it..
-	 * then bump them back to far-left and move right-most 1 more to the right
-	* else:
-	 * do next(all but rightmost)
+	Test all columns of solution_grid against the spec cols
 	"""
 	return False
-	
-def first_solution():
-	"""
-	Make the first global solution of using leftest() for every row
-	"""
-	rows = {}
-	for i in range(0, grid_max):
-		rows[i] = row(sizes[i], leftest(sizes[i]))
-	return rows	
-	
-def col(i, solution):
-	"""
-	Return column i from solution grid (looks like rows[i])
-	"""
-	col = ""
-	for row in solution:
-		col = col + solution[row][i]
-	return col
-	
-def display(rows):
-	show_header()
-	#print rows
-	for row in rows:
-		print rows[row]
-	
+    
 if __name__ == '__main__':
-	show_header()
-	#print row(sizes[0], leftest(sizes[0]))
-	#print row(sizes[1], leftest(sizes[1]))
-	#display(first_solution())
-	print col(0, first_solution())
-	#print row(sizes[0], next(leftest(sizes[0])))
+    show_header()
+    #print row(sizes[0], leftest(sizes[0]))
+    #print row(sizes[1], leftest(sizes[1]))
+    #display(first_solution())
+    print col(1, first_solution())
+    print test_col(1, col(1, first_solution()))
+    #print row(sizes[0], next(leftest(sizes[0])))
 
 
-	
+    
