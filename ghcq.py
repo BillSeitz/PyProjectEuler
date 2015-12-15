@@ -13,11 +13,34 @@ grid_max = grid_size - 1
 sizes = {}
 sizes[0] = (7,3,1,1,7)
 sizes[1] = (1,1,2,2,1,1)
+sizes[2] = (1,3,1,3,1,1,3,1)
+sizes[3] = (1,3,1,1,6,1,3,1)
+sizes[4] = (1,3,1,5,2,1,3,1)
+sizes[5] = (1,1,2,1,1)
+sizes[6] = (7,1,1,1,1,1,7)
+sizes[7] = (3,3)
+sizes[8] = (2,3,1,1,3,1,1,2)
+sizes[9] = (1,1,3,2,1,1)
+sizes[10] = (4,1,4,2,1,2)
+sizes[11] = (1,1,1,1,1,4,1,3)
+sizes[12] = (2,1,1,1,2,5)
+sizes[13] = (3,2,2,6,3,1)
+sizes[14] = (1,9,1,1,2,1)
+sizes[15] = (2,1,2,2,3,1)
+sizes[16] = (3,1,1,1,1,5,1)
+sizes[17] = (1,2,2,5)
+sizes[18] = (7,1,2,1,1,3)
+sizes[19] = (1,1,2,1,2,2,1)
+sizes[20] = (1,3,1,4,5,1)
+sizes[21] = (1,3,1,3,10,2)
+sizes[22] = (1,3,1,1,6,6)
+sizes[23] = (1,1,2,1,1,2)
+sizes[24] = (7,2,1,2,5)
 
 def show_header(): #bah just fixed for 25 right now
 	print '0123456789012345678901234'
 	
-def show_row(size_list, starts_list):
+def row(size_list, starts_list):
 	"""
 	output row as series of characters
 	"""
@@ -45,7 +68,7 @@ def leftest(size_list):
 	#print starts_list
 	return starts_list
 
-def next(starts_list):
+def next(size_list, starts_list):
 	"""
 	Return "next solution" list of starts after current solution
 	Do this recursively:
@@ -55,12 +78,25 @@ def next(starts_list):
 	* else:
 	 * do next(all but rightmost)
 	"""
+	return False
+	
+def first_solution():
+	"""
+	Make the first global solution of using leftest() for every row
+	"""
+	rows = {}
+	show_header()
+	for i in range(0, grid_max):
+		rows[i] = row(sizes[i], leftest(sizes[i]))
+		print rows[i]
 	
 	
 if __name__ == '__main__':
 	show_header()
-	print show_row(sizes[0], leftest(sizes[0]))
-	print show_row(sizes[1], leftest(sizes[1]))
+	#print row(sizes[0], leftest(sizes[0]))
+	#print row(sizes[1], leftest(sizes[1]))
+	first_solution()
+	#print row(sizes[0], next(leftest(sizes[0])))
 
 
 	
