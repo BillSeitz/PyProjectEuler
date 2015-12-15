@@ -36,6 +36,32 @@ sizes[21] = (1,3,1,3,10,2)
 sizes[22] = (1,3,1,1,6,6)
 sizes[23] = (1,1,2,1,1,2)
 sizes[24] = (7,2,1,2,5)
+cols = {}
+cols[0] = (7,2,1,1,7)
+cols[1] = (1,1,2,2,1,1)
+cols[2] = (1,3,1,3,1,3,1,3,1)
+cols[3] = (1,3,1,1,5,1,3,1)
+cols[4] = (1,3,1,1,4,1,3,1)
+cols[5] = (1,1,1,2,1,1,)
+cols[6] = (7,1,1,1,1,1,7)
+cols[7] = (1,1,3)
+cols[8] = (2,1,2,1,8,2,1)
+cols[9] = (2,2,1,2,1,1,1,2)
+cols[10] = (1,7,3,2,1)
+cols[11] = (1,2,3,1,1,1,1,1)
+cols[12] = (4,1,1,2,6)
+cols[13] = (3,3,1,1,1,3,1)
+cols[14] = (1,2,5,2,1)
+cols[15] = (2,2,1,1,1,1,1,2,1)
+cols[16] = (1,3,3,2,1,8,1)
+cols[17] = (6,2,1)
+cols[18] = (7,1,4,1,1,3)
+cols[19] = (1,1,1,1,4)
+cols[20] = (1,3,1,3,7,1)
+cols[21] = (1,3,1,1,1,2,1,1,4)
+cols[22] = (1,3,1,4,3,3)
+cols[23] = (1,1,2,2,2,6,1)
+cols[24] = (7,1,3,2,1,1)
 
 def show_header(): #bah just fixed for 25 right now
 	print '0123456789012345678901234'
@@ -85,17 +111,31 @@ def first_solution():
 	Make the first global solution of using leftest() for every row
 	"""
 	rows = {}
-	show_header()
 	for i in range(0, grid_max):
 		rows[i] = row(sizes[i], leftest(sizes[i]))
-		print rows[i]
+	return rows	
 	
+def col(i, solution):
+	"""
+	Return column i from solution grid (looks like rows[i])
+	"""
+	col = ""
+	for row in solution:
+		col = col + solution[row][i]
+	return col
+	
+def display(rows):
+	show_header()
+	#print rows
+	for row in rows:
+		print rows[row]
 	
 if __name__ == '__main__':
 	show_header()
 	#print row(sizes[0], leftest(sizes[0]))
 	#print row(sizes[1], leftest(sizes[1]))
-	first_solution()
+	#display(first_solution())
+	print col(0, first_solution())
 	#print row(sizes[0], next(leftest(sizes[0])))
 
 
