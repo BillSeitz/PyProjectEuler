@@ -138,7 +138,7 @@ def test_col(i, col):
     state = 'out'
     l = 0
     for j in col:
-        print 'j, state, l, col: ', j, state, l, col
+        #print 'j, state, l, col: ', j, state, l, col
         if (state == 'out') and (j == '0'):
             continue
         elif (state == 'in') and (j == '1'):
@@ -155,7 +155,7 @@ def test_col(i, col):
             continue
     if (state == 'in') and (l > 0):
         col_runs.append(l)
-    print col_runs
+    print 'col_runs:', col_runs
     if col_runs == cols[i]:
     	return True
     else:
@@ -165,15 +165,20 @@ def test_solution(solution):
 	"""
 	Test all columns of solution_grid against the spec cols
 	"""
-	return False
+	for i in range(0, grid_max):
+		print 'test col i:', i
+		if not test_col(i, col(i, solution)):
+			return False
+	return True
     
 if __name__ == '__main__':
     show_header()
     #print row(sizes[0], leftest(sizes[0]))
     #print row(sizes[1], leftest(sizes[1]))
     #display(first_solution())
-    print col(1, first_solution())
-    print test_col(1, col(1, first_solution()))
+    #print col(1, first_solution())
+    #print test_col(1, col(1, first_solution()))
+    print test_solution(first_solution())
     #print row(sizes[0], next(leftest(sizes[0])))
 
 
