@@ -7,6 +7,16 @@ starts = {row_num: (start1, start2...)}
 
 Remember to always use 0 as first index!
 
+Definitions:
+* row is a list of start-positions (starts_list) (combined with sizes_list)
+* row_bits is a rendered string of 0/1 chars for a row
+* solution is hash of rows where each row has 2 items: a starts_list list and a row_bits string
+ * each of those is keyed hash
+ * solution{'1':{'starts_list':[0,4,7], 'row_bits':'1100011'}}
+ * whenever change starts_list, change row_bits at same time
+* col_bits is 1 column cutting down a grid
+ * when changing 1 row you have to change All col_bits
+
 Basic process:
 * start with every row having its runs pushed to the far left
 * treat top row like ones-digit, 2nd row like tens-digit, etc.
@@ -71,55 +81,55 @@ cols[22] = (1,3,1,4,3,3)
 cols[23] = (1,1,2,2,2,6,1)
 cols[24] = (7,1,3,2,1,1)
 
-def show_header(): #bah just fixed for 25 right now
+def show_header(): # bah just fixed for 25 right now
     print '0123456789012345678901234'
     
-def row(size_list, starts_list):
+def row_bits(sizes_list, starts_list):
     """
-    return row as series of characters
+    returns row_bits series of characters for given row
     """
     #out = '0' * grid_size
     out = ''
     c = 0
-    #print 'sizes, starts:', size_list, starts_list
-    for i in range(0, len(size_list)):
-    	#print 'c, i, starts[i]:', c, i, starts_list
+    #print 'sizes, starts:', sizes_list, starts_list
+    for i in range(0, len(sizes_list)):
+        #print 'c, i, starts[i]:', c, i, starts_list
         if starts_list[i] > c: # next start is after current row
             out = out + ('0' * (starts_list[i] - c))
-        out = out + ('1' * size_list[i])
-        c = starts_list[i] + size_list[i]
+        out = out + ('1' * sizes_list[i])
+        c = starts_list[i] + sizes_list[i]
     if c < 25:
         out = out + ('0' * (25 - c))
     return out      
 
-def leftest(size_list):
+def leftest(sizes_list):
     """
-    Return "row-solution" (list of starts) for a row that puts each run as far left as possible
+    Return starts_list "row-solution" for a row that puts each run as far left as possible
     """
     starts_list = []
     c = 0
-    for run in size_list:
+    for run in sizes_list:
         starts_list.append(c)
         c = c + run + 1
-    #print starts_list
+    #print 'starts:', starts_list
     return starts_list
     
-def is_rightest(size_list, starts_list):
-	"""
-	Returns True if all the non-rightest runs are jammed as far right against the rightest one as possible.
-	"""
-	l = len(size_list)
-	rightest_start = starts_list[-1]
-	leftest_start = starts_list[0]
-	sum_left_lengths = sum(size_list[0:-1]) + (l-1) # sum of lengths (excl rightest) plus spaces
-	if rightest_start - leftest_start > sum_left_lengths:
-		return False
-	else:
-		return True
-
-def next_row(size_list, starts_list):
+def is_rightest(sizes_list, starts_list):
     """
-    Return "next row-solution" list of starts after current solution
+    Returns True if all the non-rightest runs are jammed as far right against the rightest one as possible.
+    """
+    l = len(sizes_list)
+    rightest_start = starts_list[-1]
+    leftest_start = starts_list[0]
+    sum_left_lengths = sum(sizes_list[0:-1]) + (l-1) # sum of lengths (excl rightest) plus spaces
+    if rightest_start - leftest_start > sum_left_lengths:
+        return False
+    else:
+        return True
+
+def next_row(sizes_list, starts_list):
+    """
+    Return starts_list of "next row-solution" after current solution
     Do this recursively:
     * start at right-most run
     * if rest of runs are jammed as far right as possible against it..
@@ -127,48 +137,55 @@ def next_row(size_list, starts_list):
     * else:
      * do next_row(all but rightmost) (ooh recursive!)
     """
-    if is_rightest(size_list, starts_list):
-    	if start_list[-1] + size_list[-1] == grid_size:
-    		return False
-    	new_starts_list = leftest(size_list[0:-1])
-    	new_starts_list.append(starts_list[-1] + 1)
+    if is_rightest(sizes_list, starts_list):
+        if start_list[-1] + sizes_list[-1] == grid_size:
+            return False
+        new_starts_list = leftest(sizes_list[0:-1])
+        new_starts_list.append(starts_list[-1] + 1)
     else:
-    	new_starts_list = next_row(size_list[0:-1], starts_list[0:-1])
-    	new_starts_list.append(starts_list[-1])
+        new_starts_list = next_row(sizes_list[0:-1], starts_list[0:-1])
+        new_starts_list.append(starts_list[-1])
     return new_starts_list
     
 def first_solution():
     """
     Make the first grid-solution of using leftest() for every row
     """
-    rows = {}
-    for i in range(0, grid_max):
-        rows[i] = row(sizes[i], leftest(sizes[i]))
-    return rows 
+    solution = {}
+    for i in range(0, grid_size):
+    	#print 'i:', i
+    	starts = leftest(sizes[i])
+        bits = row_bits(sizes[i], starts) # do at same time to keep in synch
+        solution[i] = {'starts_list':starts, 'row_bits': bits}
+    #print 'solution', solution
+    return (solution) 
     
-def display(rows): # output a solution grid
+def display(solution): # output a solution grid
     show_header()
-    #print rows
-    for row in rows:
-        print rows[row]
+    for row in solution.keys():
+        print 'display row_bits', solution[row]['row_bits']
     
-def col(i, solution):
+def col_bits(i, solution):
     """
-    Return column i from solution grid (looks like rows[i])
+    Return column i from solution grid (looks like rows_bits[i])
     """
-    col = ""
-    for row in solution:
-        col = col + solution[row][i]
-    return col
+    col_bits = ""
+    #print 'solution len', len(solution)
+    for row in solution.keys():
+        col_bits = col_bits + solution[row]['row_bits'][i]
+    	#print 'i, row, row_bits, col_bits', i, row, solution[row]['row_bits'], col_bits
+    #print 'col_bits final:', col_bits
+    return col_bits
     
-def test_col(i, col):
+def test_col(i, solution):
     """
     Return whether a column from a solution grid matches the spec cols
     """
+    col_bits_i = col_bits(i, solution)
     col_runs = []
     state = 'out'
     l = 0
-    for j in col:
+    for j in col_bits_i:
         #print 'j, state, l, col: ', j, state, l, col
         if (state == 'out') and (j == '0'):
             continue
@@ -188,45 +205,45 @@ def test_col(i, col):
         col_runs.append(l)
     print 'col_runs:', col_runs
     if col_runs == cols[i]:
-    	return True
+        return True
     else:
-    	return False
+        return False
 
 def test_solution(solution):
-	"""
-	Test all columns of solution_grid against the spec cols
-	"""
-	for i in range(0, grid_max):
-		print 'test col i:', i
-		if not test_col(i, col(i, solution)):
-			return False
-	return True
+    """
+    Test all columns of solution_grid against the spec cols until first Fail
+    """
+    for i in range(0, grid_max):
+        print 'test col i:', i
+        if not test_col(i, solution):
+            return False
+    return True
     
 def run_solutions():
-	i = 0
-	row_to_shift = 0
-	solution = first_solution()
-	while not test_solution(solution):
-		print i, 'fail'
-		i = i+1
-		shifted_row = next_row(sizes[row_to_shift], solution[row_to_shift])
-		if not shifted_row: # meaning returned False, so all-right, so on to next row
-			rows[row_to_shift] = row(sizes[row_to_shift], leftest(sizes[row_to_shift]))
-			row_to_shift = row_to_shift + 1
-			shifted_row = next_row(sizes[row_to_shift], solution[row_to_shift])
-	print i, '------------- Success ------------'
-	display(solution)
-		
+    i = 0
+    row_to_shift = 0
+    solution = first_solution()
+    while not test_solution(solution):
+        print i, 'fail'
+        i = i+1
+        shifted_row = next_row(sizes[row_to_shift], solution[row_to_shift])
+        if not shifted_row: # meaning returned False, so all-right, so on to next row
+            rows[row_to_shift] = row(sizes[row_to_shift], leftest(sizes[row_to_shift]))
+            row_to_shift = row_to_shift + 1
+            shifted_row = next_row(sizes[row_to_shift], solution[row_to_shift])
+    print i, '------------- Success ------------'
+    display(solution)
+        
 
 if __name__ == '__main__':
     show_header()
-    print row(sizes[0], leftest(sizes[0]))
-    #print row(sizes[1], leftest(sizes[1]))
-    #display(first_solution())
-    #print col(1, first_solution())
-    #print test_col(1, col(1, first_solution()))
-    #print test_solution(first_solution())
-    print row(sizes[0], next_row(sizes[0], leftest(sizes[0])))
+    print row_bits(sizes[0], leftest(sizes[0]))
+    print row_bits(sizes[1], leftest(sizes[1]))
+    display(first_solution())
+    print 'col_bits[1]:', col_bits(1, first_solution())
+    print test_col(1, first_solution())
+    print test_solution(first_solution())
+    #print row(sizes[0], next_row(sizes[0], leftest(sizes[0])))
 
 
     
