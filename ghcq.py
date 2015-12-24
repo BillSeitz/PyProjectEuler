@@ -138,7 +138,7 @@ def next_row(sizes_list, starts_list):
      * do next_row(all but rightmost) (ooh recursive!)
     """
     if is_rightest(sizes_list, starts_list):
-        if start_list[-1] + sizes_list[-1] == grid_size:
+        if starts_list[-1] + sizes_list[-1] == grid_size:
             return False
         new_starts_list = leftest(sizes_list[0:-1])
         new_starts_list.append(starts_list[-1] + 1)
@@ -220,7 +220,7 @@ def test_solution(solution):
     return True
     
 def run_solutions():
-    i = 0
+    i = 0 # solution counter
     row_to_shift = 0
     solution = first_solution()
     while not test_solution(solution):
@@ -238,12 +238,12 @@ def run_solutions():
 if __name__ == '__main__':
     show_header()
     print row_bits(sizes[0], leftest(sizes[0]))
-    print row_bits(sizes[1], leftest(sizes[1]))
-    display(first_solution())
-    print 'col_bits[1]:', col_bits(1, first_solution())
-    print test_col(1, first_solution())
-    print test_solution(first_solution())
-    #print row(sizes[0], next_row(sizes[0], leftest(sizes[0])))
+    #print row_bits(sizes[1], leftest(sizes[1]))
+    #display(first_solution())
+    #print 'col_bits[1]:', col_bits(1, first_solution())
+    #print test_col(1, first_solution())
+    #print test_solution(first_solution())
+    print row_bits(sizes[0], next_row(sizes[0], leftest(sizes[0])))
 
 
     
