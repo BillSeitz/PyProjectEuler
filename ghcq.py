@@ -119,6 +119,7 @@ def is_rightest(sizes_list, starts_list):
     Returns True if all the non-rightest runs are jammed as far right against the rightest one as possible.
     """
     l = len(sizes_list)
+    print 'is_rightest lists:', sizes_list, starts_list
     rightest_start = starts_list[-1]
     leftest_start = starts_list[0]
     sum_left_lengths = sum(sizes_list[0:-1]) + (l-1) # sum of lengths (excl rightest) plus spaces
@@ -138,15 +139,30 @@ def next_row(sizes_list, starts_list):
      * do next_row(all but rightmost) (ooh recursive!)
     """
     if is_rightest(sizes_list, starts_list):
+    	print 'in next_row is_rightest so...'
         if starts_list[-1] + sizes_list[-1] == grid_size:
             return False
         new_starts_list = leftest(sizes_list[0:-1])
         new_starts_list.append(starts_list[-1] + 1)
     else:
-        new_starts_list = next_row(sizes_list[0:-1], starts_list[0:-1])
+        new_starts_list = next_row(sizes_list[0:-1], starts_list[0:-1]) #recursive bit
         new_starts_list.append(starts_list[-1])
     return new_starts_list
-    
+
+def shift(solution, row_to_shift):
+	if is_rightest(solution[row_to_shift]):
+		starts_list = leftest(sizes[row_to_shift])
+		solution[row_to_shift]['starts_list'] = starts_list
+		solution[row_to_shift]['row_bits'] = row_bits(sizes[row_to_shift], starts_list)
+		row_to_shift = row_to_shift + 1
+		solution = shift(solution, row_to_shift)
+	else:
+		starts_list = next_row(sizes[row_to_shift], solution[row_to_shift]['starts_list'])
+		solution[row_to_shift]['starts_list'] = starts_list
+		solution[row_to_shift]['row_bits'] = row_bits(sizes[row_to_shift], starts_list)
+	return solution
+		
+	    
 def first_solution():
     """
     Make the first grid-solution of using leftest() for every row
@@ -226,11 +242,7 @@ def run_solutions():
     while not test_solution(solution):
         print i, 'fail'
         i = i+1
-        shifted_row = next_row(sizes[row_to_shift], solution[row_to_shift])
-        if not shifted_row: # meaning returned False, so all-right, so on to next row
-            rows[row_to_shift] = row(sizes[row_to_shift], leftest(sizes[row_to_shift]))
-            row_to_shift = row_to_shift + 1
-            shifted_row = next_row(sizes[row_to_shift], solution[row_to_shift])
+        solution = shift(solution, row_to_shift)
     print i, '------------- Success ------------'
     display(solution)
         
@@ -243,7 +255,8 @@ if __name__ == '__main__':
     #print 'col_bits[1]:', col_bits(1, first_solution())
     #print test_col(1, first_solution())
     #print test_solution(first_solution())
-    print row_bits(sizes[0], next_row(sizes[0], leftest(sizes[0])))
+    #print row_bits(sizes[0], next_row(sizes[0], leftest(sizes[0])))
+    run_solutions()
 
 
     
