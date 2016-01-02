@@ -114,16 +114,16 @@ def leftest(sizes_list):
     #print 'starts:', starts_list
     return starts_list
     
-def is_rightest(sizes_list, starts_list):
+def is_rightest(sizes_list, starts_list, total_len):
     """
-    Returns True if all the non-rightest runs are jammed as far right against the rightest one as possible.
+    Returns True if all the non-rightest runs are jammed as far right as possible.
     """
-    l = len(sizes_list)
     print 'is_rightest lists:', sizes_list, starts_list
-    rightest_start = starts_list[-1]
+    num_runs = len(sizes_list)
     leftest_start = starts_list[0]
-    sum_left_lengths = sum(sizes_list[0:-1]) + (l-1) # sum of lengths (excl rightest) plus spaces
-    if rightest_start - leftest_start > sum_left_lengths:
+    min_tot_lengths = sum(sizes_list) + num_runs - 1 # sum of lengths plus spaces
+    print 'is_rightest lists, tot-leftest, min_tot:', sizes_list, starts_list, total_len - leftest_start, min_tot_lengths
+    if total_len - leftest_start > min_tot_lengths:
         return False
     else:
         return True
@@ -150,12 +150,12 @@ def next_row(sizes_list, starts_list):
     return new_starts_list
 
 def shift(solution, row_to_shift):
-	if is_rightest(solution[row_to_shift]):
+	if is_rightest(sizes[row_to_shift], solution[row_to_shift]['starts_list'], grid_size):
 		starts_list = leftest(sizes[row_to_shift])
 		solution[row_to_shift]['starts_list'] = starts_list
 		solution[row_to_shift]['row_bits'] = row_bits(sizes[row_to_shift], starts_list)
 		row_to_shift = row_to_shift + 1
-		solution = shift(solution, row_to_shift)
+		solution = shift(solution, row_to_shift) # recursive bit
 	else:
 		starts_list = next_row(sizes[row_to_shift], solution[row_to_shift]['starts_list'])
 		solution[row_to_shift]['starts_list'] = starts_list
