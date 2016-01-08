@@ -114,32 +114,48 @@ def leftest(sizes_list):
     #print 'starts:', starts_list
     return starts_list
     
-def is_rightest(sizes_list, starts_list, total_len):
+def is_all_rightest(sizes_list, starts_list, total_len):
     """
-    Returns True if all the non-rightest runs are jammed as far right as possible.
+    Returns True if All runs are jammed as far right as possible.
     """
-    print 'is_rightest lists:', sizes_list, starts_list
+    #print 'is_all_rightest lists:', sizes_list, starts_list
     num_runs = len(sizes_list)
     leftest_start = starts_list[0]
     min_tot_lengths = sum(sizes_list) + num_runs - 1 # sum of lengths plus spaces
-    print 'is_rightest lists, tot-leftest, min_tot:', sizes_list, starts_list, total_len - leftest_start, min_tot_lengths
+    #print 'is_all_rightest lists, tot-leftest, min_tot:', sizes_list, starts_list, total_len - leftest_start, min_tot_lengths
     if total_len - leftest_start > min_tot_lengths:
+        return False
+    else:
+        return True
+
+def is_sub_rightest(sizes_list, starts_list):
+    """
+    Returns True if all the non-rightest runs are jammed as far right against the right-most as possible.
+    """
+    #print 'is_sub_rightest lists:', sizes_list, starts_list
+    num_runs = len(sizes_list) - 1
+    leftest_start = starts_list[0]
+    rightest_start = starts_list[-1]
+    min_tot_lengths = sum(sizes_list[0:-1]) + num_runs # sum of lengths plus spaces
+    #print 'is_sub_rightest lists, tot-leftest, min_tot:', sizes_list, starts_list, rightest_start - leftest_start, min_tot_lengths
+    if rightest_start - leftest_start > min_tot_lengths:
         return False
     else:
         return True
 
 def next_row(sizes_list, starts_list):
     """
-    Return starts_list of "next row-solution" after current solution
-    Do this recursively:
+    Return starts_list of "next row-solution" after current solution.
+    We know that we don't have all the runs right-jammed because that was tested in shift()
+    Do this recursively (this is different from the shift() recursion):
     * start at right-most run
     * if rest of runs are jammed as far right as possible against it..
      * then bump them back to far-left and move right-most 1 more to the right (unless it's already as far right as possible)
     * else:
      * do next_row(all but rightmost) (ooh recursive!)
     """
-    if is_rightest(sizes_list, starts_list):
-    	print 'in next_row is_rightest so...'
+    if is_sub_rightest(sizes_list, starts_list):
+    	#print 'in next_row is_rightest so...'
         if starts_list[-1] + sizes_list[-1] == grid_size:
             return False
         new_starts_list = leftest(sizes_list[0:-1])
@@ -147,10 +163,11 @@ def next_row(sizes_list, starts_list):
     else:
         new_starts_list = next_row(sizes_list[0:-1], starts_list[0:-1]) #recursive bit
         new_starts_list.append(starts_list[-1])
+    #print 'next_row: new_starts_list:', new_starts_list
     return new_starts_list
 
 def shift(solution, row_to_shift):
-	if is_rightest(sizes[row_to_shift], solution[row_to_shift]['starts_list'], grid_size):
+	if is_all_rightest(sizes[row_to_shift], solution[row_to_shift]['starts_list'], grid_size):
 		starts_list = leftest(sizes[row_to_shift])
 		solution[row_to_shift]['starts_list'] = starts_list
 		solution[row_to_shift]['row_bits'] = row_bits(sizes[row_to_shift], starts_list)
@@ -160,7 +177,7 @@ def shift(solution, row_to_shift):
 		starts_list = next_row(sizes[row_to_shift], solution[row_to_shift]['starts_list'])
 		solution[row_to_shift]['starts_list'] = starts_list
 		solution[row_to_shift]['row_bits'] = row_bits(sizes[row_to_shift], starts_list)
-	return solution
+	return (solution, row_to_shift)
 		
 	    
 def first_solution():
@@ -179,7 +196,7 @@ def first_solution():
 def display(solution): # output a solution grid
     show_header()
     for row in solution.keys():
-        print 'display row_bits', solution[row]['row_bits']
+        print solution[row]['row_bits']
     
 def col_bits(i, solution):
     """
@@ -219,7 +236,7 @@ def test_col(i, solution):
             continue
     if (state == 'in') and (l > 0):
         col_runs.append(l)
-    print 'col_runs:', col_runs
+    print 'col_runs, cols[i]:', col_runs, cols[i]
     if col_runs == cols[i]:
         return True
     else:
@@ -230,19 +247,23 @@ def test_solution(solution):
     Test all columns of solution_grid against the spec cols until first Fail
     """
     for i in range(0, grid_max):
-        print 'test col i:', i
+        print 'testing col:', i
         if not test_col(i, solution):
             return False
     return True
     
 def run_solutions():
     i = 0 # solution counter
+    print 'starting solution num', i
     row_to_shift = 0
     solution = first_solution()
-    while not test_solution(solution):
-        print i, 'fail'
+    while not test_solution(solution) and (i<999999):
+        print 'test num', i, 'fails'
         i = i+1
-        solution = shift(solution, row_to_shift)
+        solution, row_to_shift = shift(solution, row_to_shift)
+        print 'starting solution num', i
+        if i * 1.0 / 50 == int(i * 1.0 / 50):
+	        display(solution)
     print i, '------------- Success ------------'
     display(solution)
         
