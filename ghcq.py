@@ -167,12 +167,13 @@ def next_row(sizes_list, starts_list):
     return new_starts_list
 
 def shift(solution, row_to_shift):
+	print 'shifting at row', row_to_shift
 	if is_all_rightest(sizes[row_to_shift], solution[row_to_shift]['starts_list'], grid_size):
 		starts_list = leftest(sizes[row_to_shift])
 		solution[row_to_shift]['starts_list'] = starts_list
 		solution[row_to_shift]['row_bits'] = row_bits(sizes[row_to_shift], starts_list)
 		row_to_shift = row_to_shift + 1
-		solution = shift(solution, row_to_shift) # recursive bit
+		solution, row_to_shift = shift(solution, row_to_shift) # recursive bit
 	else:
 		starts_list = next_row(sizes[row_to_shift], solution[row_to_shift]['starts_list'])
 		solution[row_to_shift]['starts_list'] = starts_list
@@ -203,7 +204,7 @@ def col_bits(i, solution):
     Return column i from solution grid (looks like rows_bits[i])
     """
     col_bits = ""
-    #print 'solution len', len(solution)
+    print 'solution type, len', type(solution), len(solution)
     for row in solution.keys():
         col_bits = col_bits + solution[row]['row_bits'][i]
     	#print 'i, row, row_bits, col_bits', i, row, solution[row]['row_bits'], col_bits
@@ -256,13 +257,14 @@ def run_solutions():
     i = 0 # solution counter
     print 'starting solution num', i
     row_to_shift = 0
+    output_freq = 10
     solution = first_solution()
     while not test_solution(solution) and (i<999999):
         print 'test num', i, 'fails'
         i = i+1
-        solution, row_to_shift = shift(solution, row_to_shift)
-        print 'starting solution num', i
-        if i * 1.0 / 50 == int(i * 1.0 / 50):
+        (solution, row_to_shift) = shift(solution, row_to_shift)
+        print 'starting solution num at row', i, row_to_shift
+        if i * 1.0 / output_freq == int(i * 1.0 / output_freq):
 	        display(solution)
     print i, '------------- Success ------------'
     display(solution)
