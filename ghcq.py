@@ -24,6 +24,11 @@ Basic process:
  * bump the 2nd row row_next once and push the 1st row back to leftest, testing all the first-row variations, then
  * rest of 2nd/1st row variations combos, then
  * bump the 3rd row row_next once, etc.
+ 
+Some monitoring notes
+* "shifting at row 1" first at i=20 (note first row is 0)
+* "shifting at row 2" first at i=389843
+* "shifting at row 3" still not at 74M? Still not at 99,999,999 (99999999)
 """
 
 grid_size = 25 # 0...24
@@ -80,6 +85,11 @@ cols[21] = (1,3,1,1,1,2,1,1,4)
 cols[22] = (1,3,1,4,3,3)
 cols[23] = (1,1,2,2,2,6,1)
 cols[24] = (7,1,3,2,1,1)
+preblocks = {}
+preblocks[3] = '0001100000001100000001000'
+preblocks[8] = '0000001100100011001000000'
+preblocks[16] = '0000001000010000100010000'
+preblocks[21] = '0001100001100001000011000'
 
 def show_header(): # bah just fixed for 25 right now
     print '0123456789012345678901234'
@@ -248,10 +258,32 @@ def test_col(i, solution):
     else:
         return False
 
+def test_preblocks(j, solution):
+	"""
+	Test that row j includes the pre-blocked-out bits from the diagram
+	"""
+	row = solution[j]['row_bits']
+	preblock = preblocks[j]
+	row_b = int(row, 2)
+	preblock_b = int(preblock, 2)
+	inters = bin(row_b & preblock_b)
+	preblock_bi = bin(preblock_b) # basically drops leading 0s
+	if inters == preblock_bi:
+		#print 'preblock pass row:', j
+		return True
+	else:
+		print 'preblock fail row:', j
+		return False
+
 def test_solution(solution):
     """
-    Test all columns of solution_grid against the spec cols until first Fail
+    Test all columns of solution_grid against the spec cols until first Fail.
+    But first test the pre-blacked-out rows.
     """
+    for j in (3, 8, 16, 21):
+    	if not test_preblocks(j, solution):
+    		return False
+    print 'passes all 4 preblocks!'
     for i in range(0, grid_max):
         #print 'testing col:', i
         if not test_col(i, solution):
@@ -264,7 +296,7 @@ def run_solutions():
     row_to_shift = 0
     output_freq = 1000
     solution = first_solution()
-    while not test_solution(solution): # and (i<9999999) and row_to_shift < 5:
+    while not test_solution(solution) and (i<99999999) and row_to_shift < 3:
         print 'test num', i, 'fails'
         i = i+1
         (solution, row_to_shift) = shift(solution, 0)
