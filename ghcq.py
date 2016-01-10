@@ -167,7 +167,8 @@ def next_row(sizes_list, starts_list):
     return new_starts_list
 
 def shift(solution, row_to_shift):
-	print 'shifting at row', row_to_shift
+	if row_to_shift > 0:
+		print 'shifting at row', row_to_shift
 	if is_all_rightest(sizes[row_to_shift], solution[row_to_shift]['starts_list'], grid_size):
 		starts_list = leftest(sizes[row_to_shift])
 		solution[row_to_shift]['starts_list'] = starts_list
@@ -194,7 +195,7 @@ def first_solution():
     #print 'solution', solution
     return (solution) 
     
-def display(solution, num_rows=3): # output a solution grid
+def display(solution, num_rows=25): # output a solution grid
     show_header()
     i = 0
     for row in solution.keys():
@@ -242,6 +243,7 @@ def test_col(i, solution):
         col_runs.append(l)
     #print 'col_runs, cols[i]:', col_runs, cols[i]
     if col_runs == cols[i]:
+    	print 'pass #col!', i
         return True
     else:
         return False
@@ -251,7 +253,7 @@ def test_solution(solution):
     Test all columns of solution_grid against the spec cols until first Fail
     """
     for i in range(0, grid_max):
-        print 'testing col:', i
+        #print 'testing col:', i
         if not test_col(i, solution):
             return False
     return True
@@ -260,12 +262,12 @@ def run_solutions():
     i = 0 # solution counter
     print 'starting solution #num', i
     row_to_shift = 0
-    output_freq = 1
+    output_freq = 1000
     solution = first_solution()
-    while not test_solution(solution) and (i<18586) and row_to_shift < 2:
+    while not test_solution(solution) and (i<9999999) and row_to_shift < 5:
         print 'test num', i, 'fails'
         i = i+1
-        (solution, row_to_shift) = shift(solution, row_to_shift)
+        (solution, row_to_shift) = shift(solution, 0)
         print 'starting solution #num at #row', i, row_to_shift
         if i * 1.0 / output_freq == int(i * 1.0 / output_freq):
 	        display(solution)
