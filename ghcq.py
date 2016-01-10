@@ -194,17 +194,20 @@ def first_solution():
     #print 'solution', solution
     return (solution) 
     
-def display(solution): # output a solution grid
+def display(solution, num_rows=3): # output a solution grid
     show_header()
+    i = 0
     for row in solution.keys():
-        print solution[row]['row_bits']
+    	if i < num_rows:
+        	print solution[row]['row_bits']
+        i = i+1
     
 def col_bits(i, solution):
     """
     Return column i from solution grid (looks like rows_bits[i])
     """
     col_bits = ""
-    print 'solution type, len', type(solution), len(solution)
+    #print 'solution type, len', type(solution), len(solution)
     for row in solution.keys():
         col_bits = col_bits + solution[row]['row_bits'][i]
     	#print 'i, row, row_bits, col_bits', i, row, solution[row]['row_bits'], col_bits
@@ -237,7 +240,7 @@ def test_col(i, solution):
             continue
     if (state == 'in') and (l > 0):
         col_runs.append(l)
-    print 'col_runs, cols[i]:', col_runs, cols[i]
+    #print 'col_runs, cols[i]:', col_runs, cols[i]
     if col_runs == cols[i]:
         return True
     else:
@@ -255,18 +258,18 @@ def test_solution(solution):
     
 def run_solutions():
     i = 0 # solution counter
-    print 'starting solution num', i
+    print 'starting solution #num', i
     row_to_shift = 0
-    output_freq = 10
+    output_freq = 1
     solution = first_solution()
-    while not test_solution(solution) and (i<999999):
+    while not test_solution(solution) and (i<18586) and row_to_shift < 2:
         print 'test num', i, 'fails'
         i = i+1
         (solution, row_to_shift) = shift(solution, row_to_shift)
-        print 'starting solution num at row', i, row_to_shift
+        print 'starting solution #num at #row', i, row_to_shift
         if i * 1.0 / output_freq == int(i * 1.0 / output_freq):
 	        display(solution)
-    print i, '------------- Success ------------'
+    print i, '------------- Success (or hit end)------------'
     display(solution)
         
 
