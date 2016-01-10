@@ -264,7 +264,7 @@ def run_solutions():
     row_to_shift = 0
     output_freq = 1000
     solution = first_solution()
-    while not test_solution(solution) and (i<9999999) and row_to_shift < 5:
+    while not test_solution(solution): # and (i<9999999) and row_to_shift < 5:
         print 'test num', i, 'fails'
         i = i+1
         (solution, row_to_shift) = shift(solution, 0)
